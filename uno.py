@@ -352,7 +352,7 @@ class Oyuncu:
                 del self.el[secim]
                 return secilen
 
-    # end of def oyna
+                # end of def oyna
 
 
 # end of class oyuncu
