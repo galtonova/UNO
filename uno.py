@@ -2,6 +2,7 @@ import random
 import os
 from time import sleep
 
+
 # Kart türlerine sayı verip bunları ezberlememek
 # için yaptığım bir garip şey
 class KartTurleri:
@@ -21,6 +22,8 @@ class KartTurleri:
     arti2 = 12
     renk_degistirici = 13
     arti4 = 14
+
+
 # end of class KartTurleri
 
 
@@ -39,7 +42,7 @@ class Kart:
     deger = 0
 
     def __str__(self):
-        #return "{renk:" + str(self.renk) + ", deger:" + str(self.deger).zfill(2) + "}"
+        # return "{renk:" + str(self.renk) + ", deger:" + str(self.deger).zfill(2) + "}"
         t = ""
         if self.renk == KartTurleri.kirmizi:
             t += "Kırmızı"
@@ -71,6 +74,8 @@ class Kart:
     def __init__(self, r, d):
         self.renk = r
         self.deger = d
+
+
 # end of class Kart
 
 # Deste sınıfı
@@ -140,7 +145,7 @@ class Deste:
             yerdekiler.karistir()
             for yerdeki in yerdekiler.deste:
                 self.deste.append(yerdeki)
-            #del yerdekiler.deste
+            # del yerdekiler.deste
             yerdekiler.deste = []
             yerdekiler.uste_kart_koy(ustteki)
 
@@ -153,7 +158,6 @@ class Deste:
             kartlar.append(self.deste[0])
             del self.deste[0]
         return kartlar
-
 
     # Bunlar da yerdeki kart destesi için
 
@@ -168,6 +172,8 @@ class Deste:
     # Tüm desteyi karıştırır
     def karistir(self):
         random.shuffle(self.deste)
+
+
 # end of class Deste
 
 
@@ -185,14 +191,14 @@ class Oyuncu:
         self.el = kartlar
 
     # kart parametresiyle gelen kartı ele ekler (kart çekme işlemi için)
-    def kart_ver(self,kart: Kart):
+    def kart_ver(self, kart: Kart):
         self.el.append(kart)
 
     # oyuncunun sırası geldiğinde burası çalışacak
     def oyna(self, ortadaki, ikinci=False):
-        print("SIRADAKİ OYUNCU:", self.isim,"["+str(len(self.el))+"]")
+        print("SIRADAKİ OYUNCU:", self.isim, "[" + str(len(self.el)) + "]")
         if self.insan:
-            print("Ortadaki:",ortadaki)
+            print("Ortadaki:", ortadaki)
 
         while True:
             secim = 0
@@ -209,16 +215,16 @@ class Oyuncu:
                         if i + 1 >= 10:
                             print(str(i + 1) + ". " + str(kart))
                         else:
-                            print(" "+str(i + 1) + ". " + str(kart))
+                            print(" " + str(i + 1) + ". " + str(kart))
                     else:
                         # Kartı atamıyorsak boşluk olacak sadece
                         print("    " + str(kart))
-                secim = int(input("Kart No: "))-1
+                secim = int(input("Kart No: ")) - 1
             else:
                 # Bilgisayarın kart seçme mantığı
                 secilebilecekler = []
                 jokerler = []
-                for k in range( len(self.el) ):
+                for k in range(len(self.el)):
                     kart = self.el[k]
                     # Eğer normal bir kartsa ve atılabiliyorsa secilebilecekler dizisine koy
                     if ortadaki.renk == kart.renk or ortadaki.deger == kart.deger:
@@ -229,7 +235,7 @@ class Oyuncu:
                 # Eğer secilebilecekler dizisinde eleman varsa
                 # Onu seç
                 if len(secilebilecekler) > 0:
-                    secim = secilebilecekler[random.randint(0,len(secilebilecekler)-1)]
+                    secim = secilebilecekler[random.randint(0, len(secilebilecekler) - 1)]
                 # secilebilecekler dizisinde eleman yoksa joker seç
                 elif len(jokerler) > 0:
                     secim = jokerler[random.randint(0, len(jokerler) - 1)]
@@ -293,7 +299,9 @@ class Oyuncu:
             # Eğer kart çek / pas seçildiyse -1 döndür
             elif secim == -1:
                 return -1
-    # end of def oyna
+                # end of def oyna
+
+
 # end of class oyuncu
 
 
@@ -317,10 +325,10 @@ class Oyun:
         self.ana_deste.yeni_karisik_deste()
 
         # Oyuncuları ekle (n rakip, bir insan) ve ellerini dağıt
-        for i in range(n+1):
+        for i in range(n + 1):
             yeni_oyuncu = Oyuncu()
             yeni_oyuncu.yeni_el(self.ana_deste.kart_cek(7))
-            yeni_oyuncu.isim = "Oyuncu "+str(i)
+            yeni_oyuncu.isim = "Oyuncu " + str(i)
             self.oyuncular.append(yeni_oyuncu)
         self.oyuncular[0].insan = True
 
@@ -335,30 +343,30 @@ class Oyun:
         if ortadaki.deger == KartTurleri.pas_gec:
             self.siradaki += self.yon
             self.siradaki = self.siradaki % len(self.oyuncular)
-            print(self.oyuncular[self.siradaki].isim,"Pas Geçildi")
+            print(self.oyuncular[self.siradaki].isim, "Pas Geçildi")
 
         elif ortadaki.deger == KartTurleri.yon_degistirici:
             print("Yön Değiştirildi.",
-                  self.oyuncular[(self.siradaki+self.yon) % len(self.oyuncular)].isim,
+                  self.oyuncular[(self.siradaki + self.yon) % len(self.oyuncular)].isim,
                   "Yerine",
-                  self.oyuncular[(self.siradaki-self.yon) % len(self.oyuncular)].isim,
+                  self.oyuncular[(self.siradaki - self.yon) % len(self.oyuncular)].isim,
                   "Oynayacak")
             self.yon = -self.yon
 
         elif ortadaki.deger == KartTurleri.arti2:
             self.siradaki += self.yon
             self.siradaki = self.siradaki % len(self.oyuncular)
-            self.oyuncular[self.siradaki].kart_ver(self.ana_deste.kart_cek(1,self.yerdeki_deste))
-            self.oyuncular[self.siradaki].kart_ver(self.ana_deste.kart_cek(1,self.yerdeki_deste))
+            self.oyuncular[self.siradaki].kart_ver(self.ana_deste.kart_cek(1, self.yerdeki_deste))
+            self.oyuncular[self.siradaki].kart_ver(self.ana_deste.kart_cek(1, self.yerdeki_deste))
             print(self.oyuncular[self.siradaki].isim, " Pas Geçti ve İki Kart Çekti")
 
         elif ortadaki.deger == KartTurleri.arti4:
             self.siradaki += self.yon
             self.siradaki = self.siradaki % len(self.oyuncular)
-            self.oyuncular[self.siradaki].kart_ver(self.ana_deste.kart_cek(1,self.yerdeki_deste))
-            self.oyuncular[self.siradaki].kart_ver(self.ana_deste.kart_cek(1,self.yerdeki_deste))
-            self.oyuncular[self.siradaki].kart_ver(self.ana_deste.kart_cek(1,self.yerdeki_deste))
-            self.oyuncular[self.siradaki].kart_ver(self.ana_deste.kart_cek(1,self.yerdeki_deste))
+            self.oyuncular[self.siradaki].kart_ver(self.ana_deste.kart_cek(1, self.yerdeki_deste))
+            self.oyuncular[self.siradaki].kart_ver(self.ana_deste.kart_cek(1, self.yerdeki_deste))
+            self.oyuncular[self.siradaki].kart_ver(self.ana_deste.kart_cek(1, self.yerdeki_deste))
+            self.oyuncular[self.siradaki].kart_ver(self.ana_deste.kart_cek(1, self.yerdeki_deste))
             print(self.oyuncular[self.siradaki].isim, " Pas Geçti ve Dört Kart Çekti")
 
     # Oyunu başlat ve sürekli sıradaki oyuncuyu çalıştır
@@ -385,7 +393,7 @@ class Oyun:
         if self.oyuncular[self.siradaki].insan:
             os.system('cls' if os.name == 'nt' else 'clear')
 
-        #  destede kalan kart sayısı ve oyuncuların ellerindeki kart sayılarını yaz
+        # destede kalan kart sayısı ve oyuncuların ellerindeki kart sayılarını yaz
         print("---------------------------")
         print("deste:", str(len(self.ana_deste.deste)), end='')
         for o in range(len(self.oyuncular)):
@@ -401,24 +409,24 @@ class Oyun:
             # oyuncu kart çekmek istiyor
             sleep(0.5)
             print(self.oyuncular[self.siradaki].isim, "Kart Çekti")
-            self.oyuncular[self.siradaki].kart_ver(self.ana_deste.kart_cek(1,self.yerdeki_deste))
-            kart = self.oyuncular[self.siradaki].oyna(self.yerdeki_deste.ustteki(),True)
+            self.oyuncular[self.siradaki].kart_ver(self.ana_deste.kart_cek(1, self.yerdeki_deste))
+            kart = self.oyuncular[self.siradaki].oyna(self.yerdeki_deste.ustteki(), True)
 
         # Eğer üstte ona kart vermemize rağmen hala -1 döndürüyorsa
         # Pas geçir
         if kart == -1:
             # oyuncu kart atmadı
-            print(self.oyuncular[self.siradaki].isim,"Kart Atmadı")
+            print(self.oyuncular[self.siradaki].isim, "Kart Atmadı")
         else:
             # oyuncu kart attı
-            print(self.oyuncular[self.siradaki].isim,"Kart Attı")
-            print("Atılan Kart:",kart)
+            print(self.oyuncular[self.siradaki].isim, "Kart Attı")
+            print("Atılan Kart:", kart)
             self.yerdeki_deste.uste_kart_koy(kart)
 
             # Elindeki kartlar bittiyse
             if len(self.oyuncular[self.siradaki].el) == 0:
                 print("---------------------------")
-                print(self.oyuncular[self.siradaki].isim," KAZANDI!")
+                print(self.oyuncular[self.siradaki].isim, " KAZANDI!")
                 print("---------------------------")
                 return True
             # Elinde tek kart kaldıysa
@@ -436,6 +444,8 @@ class Oyun:
         # dönüp duracak.
         # True  döndüğü zaman if devreye girip döngüden çıkacak
         return False
+
+
 # end of class Oyun
 
 
