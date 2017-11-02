@@ -2,8 +2,11 @@ import random
 import os
 from time import sleep
 
+# Kart türlerine sayı verip bunları ezberlememek
+# için yaptığım bir garip şey
 class KartTurleri:
     # Kart Renkleri
+    # Siyah renk Joker kartlar
     siyah = 0
     kirmizi = 1
     sari = 2
@@ -18,11 +21,19 @@ class KartTurleri:
     arti2 = 12
     renk_degistirici = 13
     arti4 = 14
-
-
 # end of class KartTurleri
 
 
+# Kart sınıfı
+# print fonksiyonunda vb. kullanmak için,
+# __str__ methodu sayesinde direk
+# str( obje ) şeklinde str'ye dönüştürülebiliyor.
+# renk ve değer özellikleri var,
+# renk olan rengi (ne kadar ilginç!)
+# değer olan da rengin üzerinde yazan/çizilen şeysisi
+#
+# constructor ( __init__ ) iki parametre alıyor: renk ve değer
+# değişken = Kart(xx,xx) şeklinde oluşturuluyor
 class Kart:
     renk = 0
     deger = 0
@@ -60,15 +71,15 @@ class Kart:
     def __init__(self, r, d):
         self.renk = r
         self.deger = d
-
-
 # end of class Kart
 
-
+# Deste sınıfı
+# içinde  bir adet deste dizisi var
+# ve desteyi kontrol eden bir yığın fonksiyon var
 class Deste:
     deste = []
 
-    # Deste Oluştur
+    # Destenin içine kartları koyup karıştırır
     def yeni_karisik_deste(self):
         self.deste = []
         # 0,1,2,3,4,5,6,7,8,9,pas geç(10),yön değiştirici(11), +2(12)
@@ -113,6 +124,11 @@ class Deste:
             if k.deger != KartTurleri.arti4 and k.deger != KartTurleri.renk_degistirici:
                 return k
 
+    # Destenin en üstündeki kartı geriye döndürür ve diziden siler.
+    # Eğer deste içerisinde eleman kalmazsa, yerdekiler parametresiyle
+    # gelen diziyi alır, onun en üstündeki kartı (ortadaki) ayırır ve kalanları
+    # karıştırıp bu destenin sonuna ekler
+    # n parametresiyle birden fazla kart çekilebilir. Kart dağıtırken 7 vermek gibi
     def kart_cek(self, n=1, yerdekiler=False):
         if len(self.deste) <= n:
             print("YERDEKİ DESTE KARIŞTIRILIP ANA DESTEYE İLAVE EDİLİYOR...")
@@ -140,40 +156,39 @@ class Deste:
 
 
     # Bunlar da yerdeki kart destesi için
-    # Ana destedeki kartlar bitince yerdeki kartlar destesi
-    # karıştırılıp kullanılacak
 
+    # Destenin en üstündeki elemanı verir ama silmez
     def ustteki(self):
         return self.deste[0]
 
+    # Destenin en üstüne kart  ekler
     def uste_kart_koy(self, kart):
         self.deste.insert(0, kart)
 
+    # Tüm desteyi karıştırır
     def karistir(self):
         random.shuffle(self.deste)
-
-    # --------------------------
-
-    def __str__(self):
-        t = "{\n"
-        for index, k in enumerate(self.deste):
-            t += "\t{" + str(index).zfill(3) + ": " + str(k) + " },\n"
-        t += "}"
-        return t
 # end of class Deste
 
 
+# Oyuncu sınıfı
+# Oyuncuların adı var,
+# elindeki kartların olduğu el dizisi var,
+# bir de insan mı bilgisayar mı değişkeni var
 class Oyuncu:
     insan = False
     el = []
     isim = ""
 
+    # kartlar parametresiyle gelen kartları el içine aktarır
     def yeni_el(self, kartlar):
         self.el = kartlar
 
+    # kart parametresiyle gelen kartı ele ekler (kart çekme işlemi için)
     def kart_ver(self,kart: Kart):
         self.el.append(kart)
 
+    # oyuncunun sırası geldiğinde burası çalışacak
     def oyna(self, ortadaki, ikinci=False):
         print("SIRADAKİ OYUNCU:", self.isim,"["+str(len(self.el))+"]")
         if self.insan:
@@ -185,29 +200,40 @@ class Oyuncu:
                 if not ikinci:
                     print(" 0. Kart Çek")
                 else:
-                    print(" 0. Pas Geç")
+                    # Eğer kart çekmişsek, tekrar kart çekemeyeceğiz
+                    print(" 0. Pas")
                 for i, kart in enumerate(self.el):
+                    # Kart atılabilirse, başına index+1 i yazacağız
                     if ortadaki.renk == kart.renk or ortadaki.deger == kart.deger or kart.renk == KartTurleri.siyah:
+                        # Print yaparken daha güzel görünsün diye, 10 dan küçükse sayının başına boşluk koydurdum
                         if i + 1 >= 10:
                             print(str(i + 1) + ". " + str(kart))
                         else:
                             print(" "+str(i + 1) + ". " + str(kart))
                     else:
+                        # Kartı atamıyorsak boşluk olacak sadece
                         print("    " + str(kart))
                 secim = int(input("Kart No: "))-1
             else:
+                # Bilgisayarın kart seçme mantığı
                 secilebilecekler = []
                 jokerler = []
                 for k in range( len(self.el) ):
                     kart = self.el[k]
+                    # Eğer normal bir kartsa ve atılabiliyorsa secilebilecekler dizisine koy
                     if ortadaki.renk == kart.renk or ortadaki.deger == kart.deger:
                         secilebilecekler.append(k)
+                    # Eğer joker kartsa (siyah) jokerlere koy (+4 ve renk değiştirme)
                     elif kart.renk == KartTurleri.siyah:
                         jokerler.append(k)
+                # Eğer secilebilecekler dizisinde eleman varsa
+                # Onu seç
                 if len(secilebilecekler) > 0:
                     secim = secilebilecekler[random.randint(0,len(secilebilecekler)-1)]
+                # secilebilecekler dizisinde eleman yoksa joker seç
                 elif len(jokerler) > 0:
                     secim = jokerler[random.randint(0, len(jokerler) - 1)]
+                # jokerler dizisinde de eleman yoksa kart çek / pas geç
                 else:
                     secim = -1
 
@@ -218,6 +244,9 @@ class Oyuncu:
                 if self.insan:
                     renk = input("Yeni Renk: ")
                 else:
+                    # Bilgisayarın joker sonrası renk seçim mantığı
+                    # Elindeki kartlarda hhangi renkten en çok varsa
+                    # Onu seçer
                     yesiller = 0
                     maviler = 0
                     kirmizilar = 0
@@ -242,7 +271,8 @@ class Oyuncu:
                         renk = "kırmızı"
                     elif ls[3] == sarilar:
                         renk = "sarı"
-
+                # Yanlış yazmalarla uğraşmamak için,
+                # Girilen renk stringinin sadece ilk karakterine bak (küçük harfe çevirip)
                 if renk[0].lower() == "m":
                     renk = KartTurleri.mavi
                 elif renk[0].lower() == "s":
@@ -252,18 +282,27 @@ class Oyuncu:
                 elif renk[0].lower() == "k":
                     renk = KartTurleri.kirmizi
 
+                # eldeki seçilen kartı sil, geriye de atılacak kartı, yeni girilen renkle döndür
+                # ör. Renksiz  +4, Mavi +4 olacak vs.
                 del self.el[secim]
                 return Kart(renk, secilen.deger)
-
+            # Kart atılabiliyorsa, kartı el'den sil, ve geriye döndür
             elif ortadaki.renk == secilen.renk or ortadaki.deger == secilen.deger:
                 del self.el[secim]
                 return secilen
+            # Eğer kart çek / pas seçildiyse -1 döndür
             elif secim == -1:
                 return -1
     # end of def oyna
 # end of class oyuncu
 
 
+# Bu da asıl oyun mekaniklerinin olduğu class
+# ana_deste kart çekme destesi
+# yerdeki_deste ortaya atılan kartların olduğu deste
+# oyuncular dizisi,  oyuncular
+# sıradaki, bir sonraki oyuncunun indexi (bir oyuncu atlama vs için)
+# yon de +1 mi yoksa -1 mi gideceği (yön değiştirme kartı bunu değiştirecek)
 class Oyun:
     ana_deste = Deste()
     yerdeki_deste = Deste()
@@ -271,6 +310,7 @@ class Oyun:
     siradaki = -1
     yon = 1
 
+    # yeni oyun açar
     # n: rakip sayısı
     def yeni(self, n=3):
         # Yeni karışık deste oluştur
@@ -287,18 +327,16 @@ class Oyun:
         # İlk kartı çekip yerdeki desteye koy
         self.yerdeki_deste.uste_kart_koy(self.ana_deste.ilk_karti_cek())
 
+    # Ortadaki karta göre işlem yap
+    # Bunu ayırdım ki bir sefr yapsın
     def ortayi_degerlendir(self):
         ortadaki = self.yerdeki_deste.ustteki()
-        # pas_gec
-        # yon_degistirici
-        # arti2
-        # renk_degistirici
-        # arti4
+
         if ortadaki.deger == KartTurleri.pas_gec:
             self.siradaki += self.yon
             self.siradaki = self.siradaki % len(self.oyuncular)
-
             print(self.oyuncular[self.siradaki].isim,"Pas Geçildi")
+
         elif ortadaki.deger == KartTurleri.yon_degistirici:
             print("Yön Değiştirildi.",
                   self.oyuncular[(self.siradaki+self.yon) % len(self.oyuncular)].isim,
@@ -306,23 +344,24 @@ class Oyun:
                   self.oyuncular[(self.siradaki-self.yon) % len(self.oyuncular)].isim,
                   "Oynayacak")
             self.yon = -self.yon
+
         elif ortadaki.deger == KartTurleri.arti2:
             self.siradaki += self.yon
             self.siradaki = self.siradaki % len(self.oyuncular)
-
             self.oyuncular[self.siradaki].kart_ver(self.ana_deste.kart_cek(1,self.yerdeki_deste))
             self.oyuncular[self.siradaki].kart_ver(self.ana_deste.kart_cek(1,self.yerdeki_deste))
             print(self.oyuncular[self.siradaki].isim, " Pas Geçti ve İki Kart Çekti")
+
         elif ortadaki.deger == KartTurleri.arti4:
             self.siradaki += self.yon
             self.siradaki = self.siradaki % len(self.oyuncular)
-
             self.oyuncular[self.siradaki].kart_ver(self.ana_deste.kart_cek(1,self.yerdeki_deste))
             self.oyuncular[self.siradaki].kart_ver(self.ana_deste.kart_cek(1,self.yerdeki_deste))
             self.oyuncular[self.siradaki].kart_ver(self.ana_deste.kart_cek(1,self.yerdeki_deste))
             self.oyuncular[self.siradaki].kart_ver(self.ana_deste.kart_cek(1,self.yerdeki_deste))
             print(self.oyuncular[self.siradaki].isim, " Pas Geçti ve Dört Kart Çekti")
 
+    # Oyunu başlat ve sürekli sıradaki oyuncuyu çalıştır
     def baslat(self):
         print("YENİ OYUN BAŞLADI")
         print("---------------------------")
@@ -332,18 +371,31 @@ class Oyun:
         self.siradaki += self.yon
         input("Devam etmek için Enter'a basınız...")
         while True:
+            # Geriye True dönerse oyunu biri kazanmış demektir, çık döngüden
             if self.siradaki_oyuncu():
                 break
 
+    # sıradaki oyuncu işlemleri
     def siradaki_oyuncu(self):
+        # sıradaki oyuncu 0 ın altına ya da oyuncu sayının üstüne çıkarsa
+        # onu döndürüyoruz
         self.siradaki = self.siradaki % len(self.oyuncular)
+
+        # Eğer sıradaki oyuncu insansa, ekranı temizle
         if self.oyuncular[self.siradaki].insan:
             os.system('cls' if os.name == 'nt' else 'clear')
+
+        #  destede kalan kart sayısı ve oyuncuların ellerindeki kart sayılarını yaz
         print("---------------------------")
         print("deste:", str(len(self.ana_deste.deste)), end='')
         for o in range(len(self.oyuncular)):
             print(" o", str(o), ":", str(len(self.oyuncular[o].el)), sep='', end='')
         print("\n---------------------------")
+
+        # sıradaki oyuncu oynat.
+        # geriye kart dönerse onu atmış demek.
+        # geriye -1 dönerse kart çekecek demek.
+        # zaten kart çekmişse ve yine -1 dönerse de pas geçecek
         kart = self.oyuncular[self.siradaki].oyna(self.yerdeki_deste.ustteki())
         if kart == -1:
             # oyuncu kart çekmek istiyor
@@ -351,6 +403,9 @@ class Oyun:
             print(self.oyuncular[self.siradaki].isim, "Kart Çekti")
             self.oyuncular[self.siradaki].kart_ver(self.ana_deste.kart_cek(1,self.yerdeki_deste))
             kart = self.oyuncular[self.siradaki].oyna(self.yerdeki_deste.ustteki(),True)
+
+        # Eğer üstte ona kart vermemize rağmen hala -1 döndürüyorsa
+        # Pas geçir
         if kart == -1:
             # oyuncu kart atmadı
             print(self.oyuncular[self.siradaki].isim,"Kart Atmadı")
@@ -360,23 +415,33 @@ class Oyun:
             print("Atılan Kart:",kart)
             self.yerdeki_deste.uste_kart_koy(kart)
 
+            # Elindeki kartlar bittiyse
             if len(self.oyuncular[self.siradaki].el) == 0:
                 print("---------------------------")
                 print(self.oyuncular[self.siradaki].isim," KAZANDI!")
                 print("---------------------------")
                 return True
+            # Elinde tek kart kaldıysa
             elif len(self.oyuncular[self.siradaki].el) == 1:
                 print("---------------------------")
                 print(self.oyuncular[self.siradaki].isim, " UNO!")
                 print("---------------------------")
             self.ortayi_degerlendir()
+        # Sıradaki oyuncu index'ini yön kadar artır.
         self.siradaki += self.yon
+        # Her şey akıp gitmesin diye Enter'a basınca geçecek şekle getirdim
         input("Devam etmek için Enter'a basınız...")
+        # False geri döndüğü müddetçe
+        # yukarıdaki sonsuz while döngüsünde bu fonksiyon
+        # dönüp duracak.
+        # True  döndüğü zaman if devreye girip döngüden çıkacak
         return False
 # end of class Oyun
 
 
+# Bu da oyun kurulumu
 oyun = Oyun()
+# 3 rakip olsun dedim
 oyun.yeni(3)
+# AAAAND ACTION!
 oyun.baslat()
-i = 5
